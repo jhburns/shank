@@ -1,0 +1,2 @@
+mdformat-gfm==0.3.5
+yamllint==1.1.0

@@ -1,0 +1,13 @@
+---
+# See https://pre-commit.com for more information
+# See https://pre-commit.com/hooks.html for more hooks
+repos:
+  - repo: local
+    hooks:
+      - id: pre-commit-hook
+        name: Pre commit hook
+        # Match markdown or YAML files
+        files: "^.*\\.(md|yaml)$"
+        language: system
+        stages: [commit]
+        entry: "./lint_others.sh"

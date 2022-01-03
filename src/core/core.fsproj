@@ -1,0 +1,38 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net6.0</TargetFramework>
+    <WarningLevel>5</WarningLevel>
+    <PublishDir>.\out\</PublishDir>
+  </PropertyGroup>
+
+  <!-- Turn on unused warnings in CI, and upgrade all warnings -->
+  <PropertyGroup Condition=" '$(CI)' == 'true' ">
+    <OtherFlags>$(OtherFlags) --warnon:1182</OtherFlags>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+  </PropertyGroup>
+
+  <!-- Release mode lacks debug symbols, is published as a single file, and is trimmed -->
+  <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
+    <DebugType>None</DebugType>
+    <DebugSymbols>false</DebugSymbols>
+    <PublishSingleFile>true</PublishSingleFile>
+    <SelfContained>true</SelfContained>
+    <RuntimeIdentifier>linux-x64</RuntimeIdentifier>
+    <PublishReadyToRun>true</PublishReadyToRun>
+    <PublishTrimmed>true</PublishTrimmed>
+    <!-- Prevent warnings from unused code in dependencies -->
+    <TrimmerDefaultAction>link</TrimmerDefaultAction>
+  </PropertyGroup>
+
+  <ItemGroup Condition=" '$(Configuration)' == 'Release' ">
+    <!-- Analyze the whole library, even if attributed with "IsTrimmable" -->
+    <TrimmerRootAssembly Include="core" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Include="Program.fs" />
+  </ItemGroup>
+
+</Project>
