@@ -3,6 +3,6 @@
 set -euxo pipefail
 
 cd ./src/
-dotnet publish -c Release --verbosity quiet
+dotnet publish --verbosity quiet
 
-./test/out/test
+dotnet ./test/out/test.dll

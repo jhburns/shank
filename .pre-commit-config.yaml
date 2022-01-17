@@ -6,8 +6,8 @@ repos:
     hooks:
       - id: pre-commit-hook
         name: Pre commit hook
-        # Match markdown or YAML files
-        files: "^.*\\.(md|yaml)$"
+        # Match markdown, YAML, or F# files
+        files: "^.*\\.(md|yaml|fs)$"
         language: system
         stages: [commit]
         entry: "./lint_precommit.sh"

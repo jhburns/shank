@@ -4,7 +4,7 @@ set -euxo pipefail
 
 PATH=$PATH:~/.local/bin
 
-yamllint .
+yamllint -c .yamllint.yaml .
 mdformat --check .
 
 cd ./src/

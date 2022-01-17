@@ -11,4 +11,4 @@ COPY . .
 
 # Check markdown and yaml style
 RUN mdformat --check .
-RUN yamllint .
+RUN yamllint -c .yamllint.yaml .
