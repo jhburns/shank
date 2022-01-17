@@ -10,4 +10,12 @@ repos:
         files: "^.*\\.(md|yaml)$"
         language: system
         stages: [commit]
-        entry: "./lint_others.sh"
+        entry: "./lint_precommit.sh"
+
+      - id: pre-push-hook
+        name: Pre push hook
+        # Match F# or project files
+        files: "^.*\\.(fs|fsproj)$"
+        language: system
+        stages: [push]
+        entry: "./test_pre_push.sh"

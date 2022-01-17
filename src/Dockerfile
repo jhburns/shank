@@ -4,6 +4,7 @@ WORKDIR /app
 # Copy csproj and restore as distinct layers to cache
 COPY ./src.sln ./
 COPY core/core.fsproj ./core/
+COPY test/test.fsproj ./test/
 RUN dotnet restore
 
 COPY .config ./.config
@@ -14,16 +15,18 @@ COPY . .
 
 # Build project
 ENV CI=true
-RUN dotnet publish --verbosity quiet ./core/core.fsproj
+RUN dotnet publish --verbosity quiet
 
 # Check linting and formating
-RUN dotnet tool run dotnet-fsharplint lint ./core/core.fsproj
 RUN dotnet tool run fantomas --recurse --check ./
+RUN dotnet tool run dotnet-fsharplint lint ./core/core.fsproj ./test/test.fsproj
 
 # Build runtime image
 FROM mcr.microsoft.com/dotnet/runtime:6.0.1-focal
 
-WORKDIR /app/core/out
-COPY --from=build-env /shank/core/out .
+WORKDIR /app/
+COPY --from=build-env /app/core/out /app/core/out
+COPY --from=build-env /app/test/out /app/test/out
 
-RUN dotnet core.dll
+RUN dotnet ./core/out/core.dll
+RUN dotnet ./test/out/test.dll
