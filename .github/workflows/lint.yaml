@@ -1,7 +1,7 @@
 ---
 name: Linting
 on:
-  pull:
+  pull_request:
     branches:
       - master
 
