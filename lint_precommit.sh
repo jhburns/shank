@@ -10,4 +10,6 @@ mdformat .
 cd ./src/
 
 dotnet tool run fantomas --recurse ./
-dotnet tool run dotnet-fsharplint lint ./core/core.fsproj ./test/test.fsproj
+
+dotnet tool run dotnet-fsharplint lint ./core/core.fsproj
+dotnet tool run dotnet-fsharplint lint ./test/test.fsproj
