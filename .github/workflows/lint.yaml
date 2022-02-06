@@ -6,7 +6,7 @@ on:
       - master
 
 jobs:
-  Lint:
+  Build Image:
     runs-on: ubuntu-latest
     steps:
       -
