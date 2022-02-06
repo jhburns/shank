@@ -24,14 +24,14 @@ module Lexer =
         let mutable start = 0
         let mutable current = 0
 
-        member this.LexAll() : Result<ResizeArray<Token>, string> =
+        member this.LexAll() : Result<Token List, string> =
             try
                 while this.IsAtEnd() |> not do
                     start <- current
                     this.LexToken()
 
                 this.AddToken(EndOfFile)
-                Ok(tokens)
+                Ok(List.ofSeq (tokens))
             with
             | LexerException details -> Error(details)
 
@@ -110,4 +110,4 @@ module Lexer =
 
         member private this.AddToken(tt: TokenType) : unit = tokens.Add(newToken (tt))
 
-    let stringToTokens (source: string) : Result<ResizeArray<Token>, string> = LexerHelper(source).LexAll()
+    let stringToTokens (source: string) : Result<Token List, string> = LexerHelper(source).LexAll()
