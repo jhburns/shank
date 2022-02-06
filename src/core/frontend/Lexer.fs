@@ -16,7 +16,7 @@ module Lexer =
 
     let private newToken (t: TokenType) : Token = { Type = t }
 
-    exception LexerFailure of string
+    exception private LexerException of string
 
     type private LexerHelper(source: string) =
         let mutable tokens = new ResizeArray<Token>()
@@ -26,48 +26,48 @@ module Lexer =
 
         member this.LexAll() : Result<ResizeArray<Token>, string> =
             try
-                while this.isAtEnd () |> not do
+                while this.IsAtEnd() |> not do
                     start <- current
-                    this.lexToken ()
+                    this.LexToken()
 
-                this.addToken (EndOfFile)
+                this.AddToken(EndOfFile)
                 Ok(tokens)
             with
-            | LexerFailure details -> Error(details)
+            | LexerException details -> Error(details)
 
-        member this.lexToken() : unit =
-            match this.advance () with
-            | '(' -> this.addToken (LeftParenthesis)
-            | ')' -> this.addToken (RightParenthesis)
-            | '{' -> this.addToken (LeftBrace)
-            | '}' -> this.addToken (RightBrace)
+        member private this.LexToken() : unit =
+            match this.Advance() with
+            | '(' -> this.AddToken(LeftParenthesis)
+            | ')' -> this.AddToken(RightParenthesis)
+            | '{' -> this.AddToken(LeftBrace)
+            | '}' -> this.AddToken(RightBrace)
             // Continue on any whitespace
             | ' '
             | '\r'
             | '\n'
             | '\t' -> ()
-            | '"' -> this.lexString ()
-            | c when System.Char.IsLetter(c) -> this.lexIdentifierOrKeyword ()
-            | c -> this.throwFailure (c.ToString())
+            | '"' -> this.LexString()
+            | c when System.Char.IsLetter(c) -> this.LexIdentifierOrKeyword()
+            | c -> this.ThrowFailure(c.ToString())
 
-        member this.lexString() : unit =
-            while (this.peek () <> '"') && (this.isAtEnd () |> not) do
-                this.advance () |> ignore
+        member private this.LexString() : unit =
+            while (this.Peek() <> '"') && (this.IsAtEnd() |> not) do
+                this.Advance() |> ignore
 
-            if this.isAtEnd () then
-                this.throwFailure ("end of file")
+            if this.IsAtEnd() then
+                this.ThrowFailure("end of file")
             else
                 // Advance past the end quite
-                this.advance () |> ignore
+                this.Advance() |> ignore
 
                 // Trim the surrounding quotes
-                this.addToken (String(source.[start + 1..current - 2]))
+                this.AddToken(String(source.[start + 1..current - 2]))
 
-        member this.lexIdentifierOrKeyword() : unit =
+        member private this.LexIdentifierOrKeyword() : unit =
             let keywords = Map [ ("fn", KeyWordFn) ]
 
-            while System.Char.IsLetterOrDigit(this.peek ()) do
-                this.advance () |> ignore
+            while System.Char.IsLetterOrDigit(this.Peek()) do
+                this.Advance() |> ignore
 
             let text = source.[start..current - 1]
 
@@ -75,39 +75,39 @@ module Lexer =
             // Otherwise add identifier
             keywords.TryFind text
             |> Option.defaultValue (Identifier(text))
-            |> this.addToken
+            |> this.AddToken
 
-        member private this.advance() : char =
+        member private this.Advance() : char =
             let oldCurrent = current
             current <- current + 1
             source.[oldCurrent]
 
-        member private this.matchChar(wanted: char) : bool =
-            if this.isAtEnd () then
+        member private this.MatchChar(wanted: char) : bool =
+            if this.IsAtEnd() then
                 false
-            else if source.[current] = wanted |> not then
+            else if source.[current] <> wanted then
                 false
             else
                 current <- current + 1
                 true
 
-        member private this.peek() : char =
-            if this.isAtEnd () then
+        member private this.Peek() : char =
+            if this.IsAtEnd() then
                 '\x00'
             else
                 source.[current]
 
-        member private this.peekNext() : char =
+        member private this.PeekNext() : char =
             if current + 1 >= String.length source then
                 '\x00'
             else
                 source.[current + 1]
 
-        member private this.isAtEnd() : bool = current >= (String.length source)
+        member private this.IsAtEnd() : bool = current >= (String.length source)
 
-        member private this.throwFailure(s: string) =
-            raise (sprintf "Unexpected token '%s'" s |> LexerFailure)
+        member private this.ThrowFailure(s: string) =
+            raise ($"Unexpected token '{s}'" |> LexerException)
 
-        member private this.addToken(tt: TokenType) : unit = tokens.Add(newToken (tt))
+        member private this.AddToken(tt: TokenType) : unit = tokens.Add(newToken (tt))
 
-    let stringToTokens (source: string) : Result<ResizeArray<Token>, string> = (new LexerHelper(source)).LexAll()
+    let stringToTokens (source: string) : Result<ResizeArray<Token>, string> = LexerHelper(source).LexAll()
