@@ -10,11 +10,51 @@ module Lexer =
         | LeftBrace // {
         | RightBrace // }
         | String of string // "example"
+        | Seperator // ;
         | EndOfFile
+
+    type TokenTag =
+        | TagKeyWordFn
+        | TagIdentifier
+        | TagLeftParenthesis
+        | TagRightParenthesis
+        | TagLeftBrace
+        | TagRightBrace
+        | TagString
+        | TagSeperator
+        | TagEndOfFile
 
     type Token = { Type: TokenType }
 
     let private newToken (t: TokenType) : Token = { Type = t }
+
+    let toTokenTag (token: TokenType) : TokenTag =
+        match token with
+        | KeyWordFn -> TagKeyWordFn
+        | Identifier _ -> TagIdentifier
+        | LeftParenthesis -> TagLeftParenthesis
+        | RightParenthesis -> TagRightParenthesis
+        | LeftBrace -> TagLeftBrace
+        | RightBrace -> TagRightBrace
+        | String _ -> TagString
+        | Seperator -> TagSeperator
+        | EndOfFile -> TagEndOfFile
+
+    // Duplicating the type of tag only comparisons in the Parser
+    let tokenTagEq (tt1: TokenTag) (tt2: TokenTag) : bool =
+        match (tt1, tt2) with
+        | (TagKeyWordFn, TagKeyWordFn)
+        | (TagIdentifier, TagIdentifier)
+        | (TagLeftParenthesis, TagLeftParenthesis)
+        | (TagRightParenthesis, TagRightParenthesis)
+        | (TagLeftBrace, TagLeftBrace)
+        | (TagRightBrace, TagRightBrace)
+        | (TagString, TagString)
+        | (TagSeperator, TagSeperator)
+        | (TagEndOfFile, TagEndOfFile) -> true
+        | _ -> false
+
+    type Tokens = Token List
 
     exception private LexerException of string
 
@@ -31,7 +71,7 @@ module Lexer =
                     this.LexToken()
 
                 this.AddToken(EndOfFile)
-                Ok(List.ofSeq (tokens))
+                Ok(List.ofSeq tokens)
             with
             | LexerException details -> Error(details)
 
@@ -41,10 +81,11 @@ module Lexer =
             | ')' -> this.AddToken(RightParenthesis)
             | '{' -> this.AddToken(LeftBrace)
             | '}' -> this.AddToken(RightBrace)
-            // Continue on any whitespace
+            | ';' -> this.AddToken(Seperator)
+            // Continue on any other whitespace
+            | '\n'
             | ' '
             | '\r'
-            | '\n'
             | '\t' -> ()
             | '"' -> this.LexString()
             | c when System.Char.IsLetter(c) -> this.LexIdentifierOrKeyword()
@@ -82,26 +123,11 @@ module Lexer =
             current <- current + 1
             source.[oldCurrent]
 
-        member private this.MatchChar(wanted: char) : bool =
-            if this.IsAtEnd() then
-                false
-            else if source.[current] <> wanted then
-                false
-            else
-                current <- current + 1
-                true
-
         member private this.Peek() : char =
             if this.IsAtEnd() then
                 '\x00'
             else
                 source.[current]
-
-        member private this.PeekNext() : char =
-            if current + 1 >= String.length source then
-                '\x00'
-            else
-                source.[current + 1]
 
         member private this.IsAtEnd() : bool = current >= (String.length source)
 

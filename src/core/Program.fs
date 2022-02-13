@@ -7,15 +7,10 @@ let main _args =
         Core.Lexer.stringToTokens
             """
     fn main() {
-        print("hello world")
+        print("hello world");
     }
     """
 
-    output
-    |> List.ofSeq
-    |> List.map (sprintf "%A")
-    |> String.concat ",\n"
-    |> printfn "%s"
-    |> ignore
+    Core.Parser.tokensToAst output |> printfn "%A"
 
     0
