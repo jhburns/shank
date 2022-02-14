@@ -4,6 +4,9 @@
     <OutputType>Exe</OutputType>
     <TargetFramework>net6.0</TargetFramework>
     <WarningLevel>5</WarningLevel>
+    <!-- List of all F# warnings -->
+    <!-- https://docs.microsoft.com/en-us/dotnet/fsharp/language-reference/compiler-options#opt-in-warnings -->
+    <OtherFlags>$(OtherFlags) --warnon:3366,3517,3388,3389,3390</OtherFlags>
     <PublishDir>.\out\</PublishDir>
   </PropertyGroup>
 
