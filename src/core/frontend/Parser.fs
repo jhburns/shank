@@ -140,8 +140,8 @@ module Parser =
             | Lexer.EndOfFile -> true
             | _ -> false
 
-        member private this.Peek() : Lexer.Token = tokens [ current ]
+        member private this.Peek() : Lexer.Token = tokens.[current]
 
-        member private this.Previous() : Lexer.Token = tokens [ current - 1 ]
+        member private this.Previous() : Lexer.Token = tokens.[current - 1]
 
     let tokensToAst (tokens: Lexer.Tokens) : Result<Ast, string> = ParserHelper(tokens).ParseAll()

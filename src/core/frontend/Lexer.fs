@@ -102,7 +102,7 @@ module Lexer =
                 this.Advance() |> ignore
 
                 // Trim the surrounding quotes
-                this.AddToken(String(source [ start + 1 .. current - 2 ]))
+                this.AddToken(String(source.[start + 1..current - 2]))
 
         member private this.LexIdentifierOrKeyword() : unit =
             let keywords = Map [ ("fn", KeyWordFn) ]
@@ -110,7 +110,7 @@ module Lexer =
             while System.Char.IsLetterOrDigit(this.Peek()) do
                 this.Advance() |> ignore
 
-            let text = source [ start .. current - 1 ]
+            let text = source.[start..current - 1]
 
             // If the text is a keyword add that,
             // Otherwise add identifier
@@ -121,13 +121,13 @@ module Lexer =
         member private this.Advance() : char =
             let oldCurrent = current
             current <- current + 1
-            source [ oldCurrent ]
+            source.[oldCurrent]
 
         member private this.Peek() : char =
             if this.IsAtEnd() then
                 '\x00'
             else
-                source [ current ]
+                source.[current]
 
         member private this.IsAtEnd() : bool = current >= (String.length source)
 
