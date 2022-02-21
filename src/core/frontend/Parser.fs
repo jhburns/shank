@@ -22,7 +22,7 @@ module Parser =
 
         member this.ParseAll() : Result<Ast, string> =
             try
-                let topLevels = new ResizeArray<TopLevel>()
+                let topLevels = ResizeArray<TopLevel>()
 
                 while this.IsAtEnd() |> not do
                     topLevels.Add(this.TopLevel())
@@ -56,7 +56,7 @@ module Parser =
             Function(ident, statements)
 
         member private this.Block() : Expression List =
-            let statements = new ResizeArray<Expression>()
+            let statements = ResizeArray<Expression>()
 
             while this.Check(Lexer.TagRightBrace) |> not
                   && this.IsAtEnd() |> not do

@@ -59,7 +59,7 @@ module Lexer =
     exception private LexerException of string
 
     type private LexerHelper(source: string) =
-        let mutable tokens = new ResizeArray<Token>()
+        let tokens = ResizeArray<Token>()
 
         let mutable start = 0
         let mutable current = 0
