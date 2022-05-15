@@ -3,6 +3,7 @@
 
 [<EntryPoint>]
 let main _args =
+
     let (Ok output) =
         Core.Lexer.stringToTokens
             """

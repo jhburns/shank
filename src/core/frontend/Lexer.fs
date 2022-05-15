@@ -13,6 +13,7 @@ module Lexer =
         | Seperator // ;
         | EndOfFile
 
+    // This type exists so the Parser can check the type of a token
     type TokenTag =
         | TagKeyWordFn
         | TagIdentifier
@@ -40,7 +41,6 @@ module Lexer =
         | Seperator -> TagSeperator
         | EndOfFile -> TagEndOfFile
 
-    // Duplicating the type of tag only comparisons in the Parser
     let tokenTagEq (tt1: TokenTag) (tt2: TokenTag) : bool =
         match (tt1, tt2) with
         | (TagKeyWordFn, TagKeyWordFn)
@@ -82,6 +82,7 @@ module Lexer =
             | '{' -> this.AddToken(LeftBrace)
             | '}' -> this.AddToken(RightBrace)
             | ';' -> this.AddToken(Seperator)
+
             // Continue on any other whitespace
             | '\n'
             | ' '
@@ -98,7 +99,7 @@ module Lexer =
             if this.IsAtEnd() then
                 this.ThrowFailure("end of file")
             else
-                // Advance past the end quite
+                // Advance past the end quotes
                 this.Advance() |> ignore
 
                 // Trim the surrounding quotes

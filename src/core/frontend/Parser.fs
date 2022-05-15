@@ -15,8 +15,6 @@ module Parser =
 
     exception private ParserException of string
 
-    exception private UnreachableException
-
     type private ParserHelper(tokens: Lexer.Tokens) =
         let mutable current = 0
 
@@ -94,11 +92,11 @@ module Parser =
             if this.MatchTags([ Lexer.TagString ]) then
                 match this.Previous().Type with
                 | Lexer.String str -> (StringLiteral(str))
-                | _ -> raise UnreachableException
+                | _ -> Exception.unreachable "Checked to be a string by `MatchTags`"
             else if this.MatchTags([ Lexer.TagIdentifier ]) then
                 match this.Previous().Type with
                 | Lexer.Identifier id -> ExpressionId(Identifier(id))
-                | _ -> raise UnreachableException
+                | _ -> Exception.unreachable "Checked to be an identifier by `MatchTags`"
             else
                 raise (ParserException "Unexpected token")
 
@@ -118,7 +116,7 @@ module Parser =
         member private this.ConsumeId(errorMsg: string) : Identifier =
             match this.Consume(Lexer.TagIdentifier, errorMsg).Type with
             | Lexer.Identifier (id) -> Identifier(id)
-            | _ -> raise UnreachableException
+            | _ -> Exception.unreachable "Checked to be an identifier by `Consume`"
 
         member private this.Check(tag: Lexer.TokenTag) : bool =
             if this.IsAtEnd() then
